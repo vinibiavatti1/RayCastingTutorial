@@ -1,39 +1,58 @@
-// Projection
-const canvas = document.getElementById("projection-plane");
-const projectionPlane = canvas.getContext("2d");
-
 // Data
 let data = {
+    screen: {
+        width: 640,
+        height: 480,
+        halfWidth: null,
+        halfHeight: null,
+        scale: 4
+    },
     projection: {
-        width: 80,
-        height: 60,
-        midWidth: 80 / 2,
-        midHeight: 60 / 2,
+        width: null,
+        height: null,
+        halfWidth: null,
+        halfHeight: null
+    },
+    rayCasting: {
         incrementAngle: null,
-        scale: 10
+        precision: 64
     },
     player: {
         fov: 60,
-        midFov: 30,
+        halfFov: null,
         height: 32,
-        x: 3,
-        y: 3,
-        angle: 90,
-        distance: null
+        x: 2,
+        y: 2,
+        angle: 90
     },
-    texture: {
-        width: 8,
-        height: 8
-    },
-    cubeSize: 64,
+    textures: [
+        {
+            width: 8,
+            height: 8,
+            bitmap: [
+                [1,1,1,1,1,1,1,1],
+                [0,0,0,1,0,0,0,1],
+                [1,1,1,1,1,1,1,1],
+                [0,1,0,0,0,1,0,0],
+                [1,1,1,1,1,1,1,1],
+                [0,0,0,1,0,0,0,1],
+                [1,1,1,1,1,1,1,1],
+                [0,1,0,0,0,1,0,0]
+            ],
+            colors: [
+                "rgb(255, 241, 232)",
+                "rgb(194, 195, 199)",
+            ]
+        }
+    ],
     map: [
         [1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,1,1,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,1,0,1,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1],
+        [1,0,0,1,0,1,1,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1],
@@ -47,14 +66,23 @@ let data = {
 }
 
 // Calculated data
-data.player.distance = Math.floor(data.projection.midWidth / Math.tan(degreeToRadian(data.player.midFov)));
-data.projection.incrementAngle = data.player.fov / data.projection.width;
-canvas.width = data.projection.width * data.projection.scale;
-canvas.height = data.projection.height * data.projection.scale;
-projectionPlane.scale(data.projection.scale, data.projection.scale);
+data.screen.halfWidth = data.screen.width / 2;
+data.screen.halfHeight = data.screen.height / 2;
+data.projection.width = data.screen.width / data.screen.scale;
+data.projection.height = data.screen.height / data.screen.scale;
+data.projection.halfWidth = data.projection.width / 2;
+data.projection.halfHeight = data.projection.height / 2;
+data.rayCasting.incrementAngle = data.player.fov / data.projection.width;
+data.player.halfFov = data.player.fov / 2;
 
-// Print data
-console.log(data);
+// Canvas creation
+const screen = document.createElement('canvas');
+screen.width = data.screen.width;
+screen.height = data.screen.height;
+screen.style.border = "1px solid black";
+document.body.appendChild(screen);
+const projectionPlane = screen.getContext("2d");
+projectionPlane.scale(data.screen.scale, data.screen.scale);
 
 // Start
 main();
@@ -63,32 +91,17 @@ main();
  * Main loop
  */
 function main() {
-    let interval = setInterval(function() {
-        //data.player.angle = 300;
-        //data.player.angle += 5;
+    setInterval(function() {
         clearProjection();
         rayCasting();
-        
-        //clearInterval(interval);
     }, 30);
 }
-
-let texture = [
-            [1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,1],
-            [1,0,1,0,0,1,0,1],
-            [1,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,1],
-            [1,0,1,0,0,1,0,1],
-            [1,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1]
-        ];
 
 /**
  * Raycasting logic
  */
 function rayCasting() {
-    let rayAngle = data.player.angle - data.player.midFov;
+    let rayAngle = data.player.angle - data.player.halfFov;
     for(let rayCount = 0; rayCount < data.projection.width + 1; rayCount++) {
         
         // Ray data
@@ -98,36 +111,39 @@ function rayCasting() {
         }
 
         // Ray path incrementers
-        let rayCos = Math.cos(degreeToRadian(rayAngle)) / data.cubeSize;
-        let raySin = Math.sin(degreeToRadian(rayAngle)) / data.cubeSize;
+        let rayCos = Math.cos(degreeToRadians(rayAngle)) / data.rayCasting.precision;
+        let raySin = Math.sin(degreeToRadians(rayAngle)) / data.rayCasting.precision;
         
         // Wall finder
-        let wall = false;
-        while(!wall) {
+        let wall = 0;
+        while(wall == 0) {
             ray.x += rayCos;
             ray.y += raySin;
-            wall = data.map[Math.floor(ray.x)][Math.floor(ray.y)] > 0;
+            wall = data.map[Math.floor(ray.x)][Math.floor(ray.y)];
         }
 
-        // Texture position
-        let texturePositionX = Math.floor((data.texture.width * (ray.x + ray.y)) % data.texture.width);
-        
         // Pythagoras theorem
         let distance = Math.sqrt(Math.pow(data.player.x - ray.x, 2) + Math.pow(data.player.y - ray.y, 2));
 
         // Fish eye fix
-        distance = distance * Math.cos(degreeToRadian(rayAngle - data.player.angle));
+        distance = distance * Math.cos(degreeToRadians(rayAngle - data.player.angle));
 
         // Wall height
-        let wallHeight = data.projection.height / distance;
+        let wallHeight = Math.floor(data.projection.halfHeight / distance);
+
+        // Get texture
+        let texture = data.textures[wall -1];
+
+        // Calcule texture position
+        let texturePositionX = Math.floor((texture.width * (ray.x + ray.y)) % texture.width);
 
         // Draw
-        drawLine(rayCount, 0, rayCount, data.projection.midHeight - wallHeight, "cyan");
-        drawTexture(rayCount, wallHeight, texturePositionX);
-        drawLine(rayCount, data.projection.midHeight + wallHeight, rayCount, data.projection.height, "green");
+        drawLine(rayCount, 0, rayCount, data.projection.halfHeight - wallHeight, "black");
+        drawTexture(rayCount, wallHeight, texturePositionX, texture);
+        drawLine(rayCount, data.projection.halfHeight + wallHeight, rayCount, data.projection.height, "rgb(95, 87, 79)");
 
         // Increment
-        rayAngle += data.projection.incrementAngle;
+        rayAngle += data.rayCasting.incrementAngle;
     }
 }
 
@@ -154,14 +170,25 @@ function drawLine(x1, y1, x2, y2, cssColor) {
     projectionPlane.stroke();
 }
 
-function drawTexture(x, wallHeight, texturePositionX) {
-    let inc = data.texture.height / (wallHeight * 2);
+/**
+ * Draw texture
+ * @param {*} x 
+ * @param {*} wallHeight 
+ * @param {*} texturePositionX 
+ * @param {*} texture 
+ */
+function drawTexture(x, wallHeight, texturePositionX, texture) {
+    let inc = texture.height / (wallHeight * 2);
     let texturePositionY = 0;
     
-    for(let i = data.projection.midHeight - wallHeight; i < data.projection.midHeight + wallHeight; i++) {
+    for(let i = data.projection.halfHeight - wallHeight; i < data.projection.halfHeight + wallHeight; i++) {
+        projectionPlane.strokeStyle = texture.colors[texture.bitmap[Math.floor(texturePositionY)][texturePositionX]];
+        projectionPlane.beginPath();
+        projectionPlane.moveTo(x, i);
+        projectionPlane.lineTo(x, i+1);
+        projectionPlane.stroke();
+
         texturePositionY += inc;
-        projectionPlane.fillStyle = texture[texturePositionX][Math.floor(texturePositionY)] == 1 ? "blue" : "grey";
-        projectionPlane.fillRect(x, i, data.projection.scale, data.projection.scale);
     }
 }
 
@@ -169,11 +196,14 @@ function drawTexture(x, wallHeight, texturePositionX) {
  * Cast degree to radian
  * @param {degree} degree 
  */
-function degreeToRadian(degree) {
+function degreeToRadians(degree) {
     let pi = Math.PI;
     return degree * pi / 180;
 }
 
+/**
+ * Movement Event
+ */
 document.addEventListener('keydown', (event) => {
     let sin;
     let cos;
@@ -182,8 +212,8 @@ document.addEventListener('keydown', (event) => {
 
     switch(event.code) {
         case data.keys.up: 
-            sin = Math.cos(degreeToRadian(data.player.angle)) / 2;
-            cos = Math.sin(degreeToRadian(data.player.angle)) / 2;
+            sin = Math.cos(degreeToRadians(data.player.angle)) / 2;
+            cos = Math.sin(degreeToRadians(data.player.angle)) / 2;
             newX = data.player.x + sin;
             newY = data.player.y + cos;
             if(data.map[Math.floor(newX)][Math.floor(newY)] == 0) {
@@ -192,8 +222,8 @@ document.addEventListener('keydown', (event) => {
             }
             break;
         case data.keys.down: 
-            sin = Math.cos(degreeToRadian(data.player.angle)) / 2;
-            cos = Math.sin(degreeToRadian(data.player.angle)) / 2;
+            sin = Math.cos(degreeToRadians(data.player.angle)) / 2;
+            cos = Math.sin(degreeToRadians(data.player.angle)) / 2;
             newX = data.player.x - sin;
             newY = data.player.y - cos;
             if(data.map[Math.floor(newX)][Math.floor(newY)] == 0) {
