@@ -81,8 +81,8 @@ screen.width = data.screen.width;
 screen.height = data.screen.height;
 screen.style.border = "1px solid black";
 document.body.appendChild(screen);
-const projectionPlane = screen.getContext("2d");
-projectionPlane.scale(data.screen.scale, data.screen.scale);
+const screenContext = screen.getContext("2d");
+screenContext.scale(data.screen.scale, data.screen.scale);
 
 // Start
 main();
@@ -151,7 +151,7 @@ function rayCasting() {
  * Clear projection plane
  */
 function clearProjection() {
-    projectionPlane.clearRect(0, 0, data.projection.width, data.projection.height);
+    screenContext.clearRect(0, 0, data.projection.width, data.projection.height);
 }
 
 /**
@@ -163,11 +163,11 @@ function clearProjection() {
  * @param {String} cssColor 
  */
 function drawLine(x1, y1, x2, y2, cssColor) {
-    projectionPlane.strokeStyle = cssColor;
-    projectionPlane.beginPath();
-    projectionPlane.moveTo(x1, y1);
-    projectionPlane.lineTo(x2, y2);
-    projectionPlane.stroke();
+    screenContext.strokeStyle = cssColor;
+    screenContext.beginPath();
+    screenContext.moveTo(x1, y1);
+    screenContext.lineTo(x2, y2);
+    screenContext.stroke();
 }
 
 /**
@@ -182,11 +182,11 @@ function drawTexture(x, wallHeight, texturePositionX, texture) {
     let texturePositionY = 0;
     
     for(let i = data.projection.halfHeight - wallHeight; i < data.projection.halfHeight + wallHeight; i++) {
-        projectionPlane.strokeStyle = texture.colors[texture.bitmap[Math.floor(texturePositionY)][texturePositionX]];
-        projectionPlane.beginPath();
-        projectionPlane.moveTo(x, i);
-        projectionPlane.lineTo(x, i+1);
-        projectionPlane.stroke();
+        screenContext.strokeStyle = texture.colors[texture.bitmap[Math.floor(texturePositionY)][texturePositionX]];
+        screenContext.beginPath();
+        screenContext.moveTo(x, i);
+        screenContext.lineTo(x, i+1);
+        screenContext.stroke();
 
         texturePositionY += inc;
     }
