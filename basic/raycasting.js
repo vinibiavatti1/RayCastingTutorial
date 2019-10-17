@@ -6,6 +6,9 @@ let data = {
         halfWidth: null,
         halfHeight: null
     },
+    render: {
+        delay: 30
+    },
     rayCasting: {
         incrementAngle: null,
         precision: 64
@@ -15,7 +18,11 @@ let data = {
         halfFov: null,
         x: 2,
         y: 2,
-        angle: 90
+        angle: 90,
+        speed: {
+            movement: 0.3,
+            rotation: 5.0
+        }
     },
     map: [
         [1,1,1,1,1,1,1,1,1,1],
@@ -28,7 +35,13 @@ let data = {
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1],
-    ]
+    ],
+    key: {
+        up: "KeyW",
+        down: "KeyS",
+        left: "KeyA",
+        right: "KeyD"
+    }
 }
 
 // Calculated data
@@ -37,16 +50,41 @@ data.screen.halfHeight = data.screen.height / 2;
 data.rayCasting.incrementAngle = data.player.fov / data.screen.width;
 data.player.halfFov = data.player.fov / 2;
 
-// Canvas creation
+// Canvas
 const screen = document.createElement('canvas');
 screen.width = data.screen.width;
 screen.height = data.screen.height;
 screen.style.border = "1px solid black";
 document.body.appendChild(screen);
+
+// Canvas context
 const screenContext = screen.getContext("2d");
-//screenContext.translate(.5, .5);
-screenContext.fillStyle = "black";
-screenContext.fillRect(0,0,100,100);
+
+/**
+ * Cast degree to radian
+ * @param {Number} degree 
+ */
+function degreeToRadians(degree) {
+    let pi = Math.PI;
+    return degree * pi / 180;
+}
+
+/**
+ * Draw line into screen
+ * @param {Number} x1 
+ * @param {Number} y1 
+ * @param {Number} x2 
+ * @param {Number} y2 
+ * @param {String} cssColor 
+ */
+function drawLine(x1, y1, x2, y2, cssColor) {
+    screenContext.strokeStyle = cssColor;
+    screenContext.beginPath();
+    screenContext.moveTo(x1, y1);
+    screenContext.lineTo(x2, y2);
+    screenContext.stroke();
+}
+
 // Start
 main();
 
@@ -54,10 +92,10 @@ main();
  * Main loop
  */
 function main() {
-    //setInterval(function() {
-        //clearScreen();
+    setInterval(function() {
+        clearScreen();
         rayCasting();
-    //}, 200);
+    }, data.render.dalay);
 }
 
 /**
@@ -82,19 +120,22 @@ function rayCasting() {
         while(wall == 0) {
             ray.x += rayCos;
             ray.y += raySin;
-            wall = data.map[Math.floor(ray.x)][Math.floor(ray.y)];
+            wall = data.map[Math.floor(ray.y)][Math.floor(ray.x)];
         }
 
         // Pythagoras theorem
         let distance = Math.sqrt(Math.pow(data.player.x - ray.x, 2) + Math.pow(data.player.y - ray.y, 2));
 
+        // Fish eye fix
+        distance = distance * Math.cos(degreeToRadians(rayAngle - data.player.angle));
+
         // Wall height
         let wallHeight = Math.floor(data.screen.halfHeight / distance);
 
         // Draw
-        drawLine(rayCount, 0, rayCount, data.screen.halfHeight - wallHeight, "black");
+        drawLine(rayCount, 0, rayCount, data.screen.halfHeight - wallHeight, "cyan");
         drawLine(rayCount, data.screen.halfHeight - wallHeight, rayCount, data.screen.halfHeight + wallHeight, "red");
-        drawLine(rayCount, data.screen.halfHeight + wallHeight, rayCount, data.screen.height, "black");
+        drawLine(rayCount, data.screen.halfHeight + wallHeight, rayCount, data.screen.height, "green");
 
         // Increment
         rayAngle += data.rayCasting.incrementAngle;
@@ -109,26 +150,36 @@ function clearScreen() {
 }
 
 /**
- * Draw line into screen
- * @param {Number} x1 
- * @param {Number} y1 
- * @param {Number} x2 
- * @param {Number} y2 
- * @param {String} cssColor 
+ * Movement Event
  */
-function drawLine(x1, y1, x2, y2, cssColor) {
-    screenContext.strokeStyle = cssColor;
-    screenContext.beginPath();
-    screenContext.moveTo(x1, y1);
-    screenContext.lineTo(x2, y2);
-    screenContext.stroke();
-}
+document.addEventListener('keydown', (event) => {
+    let keyCode = event.code;
 
-/**
- * Cast degree to radian
- * @param {degree} degree 
- */
-function degreeToRadians(degree) {
-    let pi = Math.PI;
-    return degree * pi / 180;
-}
+    if(keyCode === data.key.up) {
+        let playerCos = Math.cos(degreeToRadians(data.player.angle)) * data.player.speed.movement;
+        let playerSin = Math.sin(degreeToRadians(data.player.angle)) * data.player.speed.movement;
+        let newX = data.player.x + playerCos;
+        let newY = data.player.y + playerSin;
+
+        // Collision test
+        if(data.map[Math.floor(newY)][Math.floor(newX)] == 0) {
+            data.player.x = newX;
+            data.player.y = newY;
+        }
+    } else if(keyCode === data.key.down) {
+        let playerCos = Math.cos(degreeToRadians(data.player.angle)) * data.player.speed.movement;
+        let playerSin = Math.sin(degreeToRadians(data.player.angle)) * data.player.speed.movement;
+        let newX = data.player.x - playerCos;
+        let newY = data.player.y - playerSin;
+
+        // Collision test
+        if(data.map[Math.floor(newY)][Math.floor(newX)] == 0) {
+            data.player.x = newX;
+            data.player.y = newY;
+        }
+    } else if(keyCode === data.key.left) {
+        data.player.angle -= data.player.speed.rotation;
+    } else if(keyCode === data.key.right) {
+        data.player.angle += data.player.speed.rotation;
+    } 
+});

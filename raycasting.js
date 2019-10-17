@@ -5,7 +5,7 @@ let data = {
         height: 480,
         halfWidth: null,
         halfHeight: null,
-        scale: 4
+        scale: 1
     },
     projection: {
         width: null,
@@ -24,6 +24,24 @@ let data = {
         x: 2,
         y: 2,
         angle: 90
+    },
+    map: [
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,1,0,1,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1],
+        [1,0,0,1,0,1,1,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1],
+    ],
+    keys: {
+        up: "KeyW",
+        down: "KeyS",
+        left: "KeyA",
+        right: "KeyD"
     },
     textures: [
         {
@@ -44,25 +62,7 @@ let data = {
                 "rgb(194, 195, 199)",
             ]
         }
-    ],
-    map: [
-        [1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,1,1,0,1,0,0,1],
-        [1,0,0,1,0,0,1,0,0,1],
-        [1,0,0,1,0,0,1,0,0,1],
-        [1,0,0,1,0,1,1,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,1,1],
-    ],
-    keys: {
-        up: "KeyW",
-        down: "KeyS",
-        left: "KeyA",
-        right: "KeyD"
-    }
+    ]
 }
 
 // Calculated data
@@ -83,6 +83,7 @@ screen.style.border = "1px solid black";
 document.body.appendChild(screen);
 const screenContext = screen.getContext("2d");
 screenContext.scale(data.screen.scale, data.screen.scale);
+screenContext.translate(0.5, 0.5);
 
 // Start
 main();
@@ -132,7 +133,7 @@ function rayCasting() {
         let wallHeight = Math.floor(data.projection.halfHeight / distance);
 
         // Get texture
-        let texture = data.textures[wall -1];
+        let texture = data.textures[wall - 1];
 
         // Calcule texture position
         let texturePositionX = Math.floor((texture.width * (ray.x + ray.y)) % texture.width);
@@ -178,17 +179,15 @@ function drawLine(x1, y1, x2, y2, cssColor) {
  * @param {*} texture 
  */
 function drawTexture(x, wallHeight, texturePositionX, texture) {
-    let inc = texture.height / (wallHeight * 2);
-    let texturePositionY = 0;
-    
-    for(let i = data.projection.halfHeight - wallHeight; i < data.projection.halfHeight + wallHeight; i++) {
-        screenContext.strokeStyle = texture.colors[texture.bitmap[Math.floor(texturePositionY)][texturePositionX]];
+    let yIncrementer = (wallHeight * 2) / texture.height;
+    let y = data.projection.halfHeight - wallHeight;
+    for(let i = 0; i < texture.height; i++) {
+        screenContext.strokeStyle = texture.colors[texture.bitmap[i][texturePositionX]];
         screenContext.beginPath();
-        screenContext.moveTo(x, i);
-        screenContext.lineTo(x, i+1);
+        screenContext.moveTo(x, y);
+        screenContext.lineTo(x, y + yIncrementer);
         screenContext.stroke();
-
-        texturePositionY += inc;
+        y += yIncrementer;
     }
 }
 
