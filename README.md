@@ -1,5 +1,9 @@
-# Ray Casting Tutorial
-A simple RayCasting rendering tutorial for game development
+<p align="center">
+    <img src="https://github.com/vinibiavatti1/RayCastingTutorial/blob/master/resources/logo.png?raw=true" />
+    <h1 align="center">RayCasting Tutorial</h1>
+    <p align="center">A tutorial repository for anyone who wants to learn how to render RayCasting like old 3D games!</p>
+    <p align="center">[-- Tutorial --](https://github.com/vinibiavatti1/RayCastingTutorial/wiki)</p>
+</p>
 
 ### Introduction
 
