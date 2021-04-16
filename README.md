@@ -27,6 +27,6 @@ The implementation is not so hard, but you have to know the basics of trigonomet
 
 Click in this [link](https://github.com/vinibiavatti1/RayCastingTutorial/wiki) to access the tutorial. This tutorial is in the Wiki page of this repository.
 
-### Issues
+### Contributing
 
 If you wants to contribute for this tutorial, suggest some fix, found something wrong or contribute to this project, please, open an issue in this repository and I will analyze it with great pleasure. Thanks!
