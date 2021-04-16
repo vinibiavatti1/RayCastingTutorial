@@ -222,7 +222,7 @@ function drawFloor(x1, wallHeight, rayAngle) {
     for(y = start; y < data.projection.height; y++) {
         // Create distance and calculate it
         distance = data.projection.height / (2 * y - data.projection.height)
-        distance = distance / Math.cos(degreeToRadians(playerAngle) - degreeToRadians(rayAngle))
+        // distance = distance * Math.cos(degreeToRadians(playerAngle) - degreeToRadians(rayAngle))
 
         // Get the tile position
         tilex = distance * directionCos
