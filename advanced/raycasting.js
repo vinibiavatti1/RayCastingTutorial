@@ -90,6 +90,14 @@ let data = {
             data: null
         }
     ],
+    floorTextures: [
+        {
+            width: 16,
+            height: 16,
+            id: "floor-texture",
+            data: null
+        }
+    ],
     backgrounds: [
         {
             width: 360,
@@ -200,6 +208,46 @@ function drawLine(x1, y1, y2, color) {
     }
 }
 
+/**
+ * Floorcasting
+ * @param {*} x1 
+ * @param {*} wallHeight 
+ * @param {*} rayAngle 
+ */
+function drawFloor(x1, wallHeight, rayAngle) {
+    start = data.projection.halfHeight + wallHeight + 1;
+    directionCos = Math.cos(degreeToRadians(rayAngle))
+    directionSin = Math.sin(degreeToRadians(rayAngle))
+    playerAngle = data.player.angle
+    for(y = start; y < data.projection.height; y++) {
+        // Create distance and calculate it
+        distance = data.projection.height / (2 * y - data.projection.height)
+        distance = distance / Math.cos(degreeToRadians(playerAngle) - degreeToRadians(rayAngle))
+
+        // Get the tile position
+        tilex = distance * directionCos
+        tiley = distance * directionSin
+        tilex += data.player.x
+        tiley += data.player.y
+        tile = data.map[Math.floor(tiley)][Math.floor(tilex)]
+        
+        // Get texture
+        texture = data.floorTextures[tile]
+
+        if(!texture) {
+            continue
+        }
+
+        // Define texture coords
+        texture_x = (Math.floor(tilex * texture.width)) % texture.width
+        texture_y = (Math.floor(tiley * texture.height)) % texture.height
+        
+        // Get pixel color
+        color = texture.data[texture_x + texture_y * texture.width];
+        drawPixel(x1, y, color)
+    }
+}
+
 // Start
 window.onload = function() {
     loadTextures();
@@ -217,7 +265,7 @@ function main() {
         clearScreen();
         movePlayer();
         rayCasting();
-        drawSprites();
+        // drawSprites();
         renderBuffer();
     }, data.render.dalay);
 }
@@ -277,7 +325,7 @@ function rayCasting() {
         // Draw
         drawBackground(rayCount, 0, data.projection.halfHeight - wallHeight, data.backgrounds[0]);
         drawTexture(rayCount, wallHeight, texturePositionX, texture);
-        drawLine(rayCount, data.projection.halfHeight + wallHeight, data.projection.height, new Color(9, 47, 20, 255));
+        drawFloor(rayCount, wallHeight, rayAngle)
 
         // Increment
         rayAngle += data.rayCasting.incrementAngle;
@@ -397,7 +445,7 @@ function drawTexture(x, wallHeight, texturePositionX, texture) {
         } else {
             color = texture.colors[texture.bitmap[i][texturePositionX]];
         }
-        drawLine(x, y, Math.floor(y + (yIncrementer + 0.5)), color);
+        drawLine(x, y, Math.floor(y + yIncrementer + 2), color);
         y += yIncrementer;
     }
 }
@@ -409,6 +457,11 @@ function loadTextures() {
     for(let i = 0; i < data.textures.length; i++) {
         if(data.textures[i].id) {
             data.textures[i].data = getTextureData(data.textures[i]);
+        }
+    }
+    for(let i = 0; i < data.floorTextures.length; i++) {
+        if(data.floorTextures[i].id) {
+            data.floorTextures[i].data = getTextureData(data.floorTextures[i]);
         }
     }
 }
