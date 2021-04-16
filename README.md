@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://github.com/vinibiavatti1/RayCastingTutorial/blob/master/resources/logo.png?raw=true" />
+    <a href="https://github.com/vinibiavatti1/RayCastingTutorial/wiki" align="center"><img src="https://github.com/vinibiavatti1/RayCastingTutorial/blob/master/resources/logo.png?raw=true" /></a>
     <h1 align="center">RayCasting Tutorial</h1>
     <p align="center">A tutorial repository for anyone who wants to learn how to render RayCasting like old 3D games!</p>
     <h3 align="center"><a href="https://github.com/vinibiavatti1/RayCastingTutorial/wiki">-- Tutorial --</a></h3>
