@@ -95,7 +95,7 @@ function main() {
     setInterval(function() {
         clearScreen();
         rayCasting();
-    }, data.render.dalay);
+    }, data.render.delay);
 }
 
 /**
