@@ -7,7 +7,7 @@
 
 ### Introduction
 
-RayCasting is a technique to create a 3D projection based on 2D plane. This technique was used for old games when the computers didn't have a good performance like today computers. You can find this rendering method in [Wolfstein 3D](https://en.wikipedia.org/wiki/Wolfenstein_3D) that is considered to be the first 3D game ever. The game [DOOM](https://en.wikipedia.org/wiki/Doom_(1993_video_game)) uses a similar technique known as [binary space partitioning (BSP)](https://en.wikipedia.org/wiki/Binary_space_partitioning), but this tutorial is focused on the RayCasting implementation only.
+RayCasting is a technique to create a 3D projection based on 2D plane. This technique was used for old games when computers didn't have a good performance like today computers. You can find this rendering method in [Wolfstein 3D](https://en.wikipedia.org/wiki/Wolfenstein_3D) that is considered to be the first 3D game ever. The game [DOOM](https://en.wikipedia.org/wiki/Doom_(1993_video_game)) uses a similar technique known as [binary space partitioning (BSP)](https://en.wikipedia.org/wiki/Binary_space_partitioning), but this tutorial is focused on the RayCasting implementation only.
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Simple_raycasting_with_fisheye_correction.gif" />
 
