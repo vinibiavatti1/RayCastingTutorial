@@ -94,8 +94,8 @@ function drawLine(x1, y1, x2, y2, cssColor) {
  * Draw rectangle into screen
  * @param {Number} x1 - x coordinate of rectangle
  * @param {Number} y1 - y coordiante of rectangle
- * @param {Number} w - Width of rectangle
- * @param {Number} h - Height of rectangle
+ * @param {Number} w  - Width of rectangle
+ * @param {Number} h  - Height of rectangle
  * @param {String} cssColor - Color of rectangle
  * @param {Boolean} [fill=false] - Decides whether fill or not
  */
@@ -114,7 +114,7 @@ function drawRect(x1, y1, w, h, cssColor, fill = false) {
  * Draw circle into screen
  * @param {Number} x1 - x coordinate of circle
  * @param {Number} y1 - y coordinate of circle
- * @param {Number} radius - Radius of circle
+ * @param {Number} radius   - Radius of circle
  * @param {String} cssColor - Color of circle
  */
 function drawCircle(x1, y1, radius, cssColor) {
@@ -188,7 +188,7 @@ function rayCasting() {
  * @param {Number} x1 - x coordinate where map will be drawn from
  * @param {Number} y1 - y coordinate where map will be drawn from
  * @param {Number} w  - Width of each rectangle in map
- * @param {Number} h  - Height of each rectangke in map
+ * @param {Number} h  - Height of each rectangle in map
  */
 function drawHudMap(x1 = 0, y1 = 0, w = 10, h = 10) {
     // y/x
