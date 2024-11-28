@@ -13,7 +13,7 @@ RayCasting is a technique to create a 3D projection based on 2D plane. This tech
 
 ### Programming language
 
-The programming language used for this tutorial is Javascript with HTML5. This was choosen because the ease of implementation and because this language has weak-typing, so this is fast to program in. The other rason for this language is that you will not need a lot of resources to execute your code, just a web browser. I recommend to use some IDE, like [Visual Studio Code](https://code.visualstudio.com/) for coding.  
+The programming language used for this tutorial is Javascript with HTML5. This was choosen because the ease of implementation and because this language has weak-typing, so this is fast to program in. The other reason for this language is that you will not need a lot of resources to execute your code, just a web browser. I recommend to use some IDE, like [Visual Studio Code](https://code.visualstudio.com/) for coding.  
 
 ### Pre-requisites
 
